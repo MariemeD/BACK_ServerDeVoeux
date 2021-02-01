@@ -46,6 +46,7 @@ app.use(function (req, res, next) {
 
 app.use(bodyParser.json());
 app.use(express.json()) //
+app.use('/api', routes);
 
 // Connexion base de données
 mongoose.connect(
