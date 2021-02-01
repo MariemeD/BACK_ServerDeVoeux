@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const bodyParser= require('body-parser');
 const mongoose = require('mongoose');
-const connexionChain = 'mongodb+srv://SDV_USER:serveurdevoeux@cluster0.82glw.mongodb.net/SDV?retryWrites=true&w=majority'
+const connexionChain = 'mongodb+srv://USER_SDV:serveurdevoeux@cluster0.fdsvw.mongodb.net/SDV?retryWrites=true&w=majority'
 const routes = require('./routes/routes');
 const expressSwagger = require('express-swagger-generator')(app);
 mongoose.set('useFindAndModify', false);
