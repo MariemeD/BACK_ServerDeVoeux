@@ -1,3 +1,4 @@
+// DECLARATION
 const express = require('express');
 const app = express();
 const bodyParser= require('body-parser');
@@ -6,7 +7,33 @@ const connexionChain = 'mongodb+srv://USER_SDV:serveurdevoeux@cluster0.fdsvw.mon
 const routes = require('./routes/routes');
 const expressSwagger = require('express-swagger-generator')(app);
 mongoose.set('useFindAndModify', false);
+let options = {
+    swaggerDefinition: {
+        info: {
+            description: 'SDV API CRUD : Marion L, Soukayna M, Lauraine H, Marieme D',
+            title: 'Swagger',
+            version: '1.0.0',
+        },
+        host: 'localhost:3000',
+        basePath: '/api',
+        produces: [
+            "application/json",
+            "application/xml"
+        ],
+        securityDefinitions: {
+            JWT: {
+                type: 'apiKey',
+                in: 'header',
+                name: 'Authorization',
+                description: "",
+            }
+        }
+    },
+    basedir: __dirname, //app absolute path
+    files: ['./routes/*.js'] //Path to the API handle folder
+};
 
+// USE
 app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use(function (req, res, next) {
@@ -27,7 +54,7 @@ mongoose.connect(
         console.log('Base de données : OK');
     });
 
-// expressSwagger(options);
+expressSwagger(options);
 
 app.listen(process.env.PORT || 3000, function() {
     console.log('Server : OK');
