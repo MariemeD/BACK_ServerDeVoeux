@@ -126,6 +126,22 @@ router.post("/prime",async (req,res)=>{
     })
 });
 
+/**
+ * Add a new group
+ * @route POST /group
+ * @group group - Operations about group
+ * @returns {group.model} 201 - A new group is added
+ * @returns {Error}  400 -  Bad Request
+ */
+router.post("/group",async (req,res)=>{
+    let newGroup = new group(req.body);
+    await newGroup.save().then((result)=>{
+        res.status(201).json({ NewGroup : "201 => " + newGroup._id})
+    },(err)=>{
+        res.status(400).json(err)
+    })
+});
+
 // ----------------------------
 // -----------[GET]------------
 // ----------------------------
@@ -169,6 +185,21 @@ router.get("/status",async (req,res)=>{
  */
 router.get("/primes",async (req,res)=>{
     await prime.find({}).then((result)=>{
+        res.status(200).json(result)
+    },(err)=>{
+        res.status(404).json(err)
+    })
+});
+
+/**
+ * Get all groups
+ * @route GET /groups
+ * @group group - Operations about group
+ * @returns {object} 200 - All Groups
+ * @returns {Error}  404 - Groups Not found
+ */
+router.get("/groups",async (req,res)=>{
+    await group.find({}).then((result)=>{
         res.status(200).json(result)
     },(err)=>{
         res.status(404).json(err)
@@ -233,6 +264,23 @@ router.put('/prime/:idPrime', async (req, res) => {
     }
 });
 
+/**
+ * Update a group
+ * @route PUT /group/{idGroup}
+ * @group group - Operations about group
+ * @param {string} idGroup.path.required - The id of the group you want to update
+ * @returns {object} 200 - Group updated
+ * @returns {Error}  default - Unexpected error
+ */
+router.put('/group/:idGroup', async (req, res) => {
+    try {
+        await group.findByIdAndUpdate(req.params.idGroup, req.body)
+        await group.save()
+        res.status(200).json({ Result : "200 - Group updated"})
+    } catch (err) {
+        res.status(204).json({ Result : "204 - Group not updated"})
+    }
+});
 
 // ----------------------------
 // ----------[DELETE]----------
@@ -285,6 +333,24 @@ router.delete("/status/:idStatus", async (req, res) => {
 router.delete("/prime/:idPrime", async (req, res) => {
     try {
         await prime.deleteOne({ _id: req.params.idPrime })
+        res.status(200).send()
+    } catch {
+        res.status(404)
+        res.send({ error: "404" })
+    }
+})
+
+/**
+ * Delete group
+ * @route DELETE /group/{idGroup}
+ * @group group - Operations about group
+ * @param {string} idGroup.path.required - The id of the group to be deleted
+ * @returns {object} 200 - group deleted
+ * @returns {Error}  404 - group not found
+ */
+router.delete("/group/:idGroup", async (req, res) => {
+    try {
+        await group.deleteOne({ _id: req.params.idGroup })
         res.status(200).send()
     } catch {
         res.status(404)
