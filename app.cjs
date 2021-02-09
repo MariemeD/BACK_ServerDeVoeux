@@ -11,7 +11,7 @@ let options = {
     swaggerDefinition: {
         info: {
             description: 'SDV API CRUD : Marion L, Soukayna M, Lauraine H, Marieme D',
-            title: 'Swagger',
+            title: 'Swagger API Serveur de Voeux',
             version: '1.0.0',
         },
         host: 'localhost:3000',
