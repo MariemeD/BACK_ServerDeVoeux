@@ -304,6 +304,149 @@ router.get("/courses",async (req,res)=>{
     })
 });
 
+/**
+ * Get a Course by id
+ * @route GET /courses/{idCourse}
+ * @group course - Operations about course
+ * @param {string} idCourse.path.required - The id of the course we are looking for
+ * @returns {object} 200 - A course
+ * @returns {Error}  404 - Course Not found
+ */
+router.route('/courses/:idCourse').get(function async(req,res){
+    course.findById(req.params.idCourse, function(err, course) {
+        if (err)
+            res.status(404).json(err);
+        res.status(200).json(course);
+    });
+});
+
+/**
+ * Get a Discharge by id
+ * @route GET /discharges/{idDischarge}
+ * @group discharge - Operations about discharge
+ * @param {string} idDischarge.path.required - The id of the discharge we are looking for
+ * @returns {object} 200 - A discharge
+ * @returns {Error}  404 - Discharge Not found
+ */
+router.route('/discharges/:idDischarge').get(function async(req,res){
+    discharge.findById(req.params.idDischarge, function(err, discharge) {
+        if (err)
+            res.status(404).json(err);
+        res.status(200).json(discharge);
+    });
+});
+
+/**
+ * Get a Group by id
+ * @route GET /groups/{idGroup}
+ * @group group - Operations about group
+ * @param {string} idGroup.path.required - The id of the group we are looking for
+ * @returns {object} 200 - A group
+ * @returns {Error}  404 - Group Not found
+ */
+router.route('/groups/:idGroup').get(function async(req,res){
+    group.findById(req.params.idGroup, function(err, group) {
+        if (err)
+            res.status(404).json(err);
+        res.status(200).json(group);
+    });
+});
+
+/**
+ * Get a Origin by id
+ * @route GET /origins/{idOrigin}
+ * @group origin - Operations about origin
+ * @param {string} idOrigin.path.required - The id of the origin we are looking for
+ * @returns {object} 200 - A origin
+ * @returns {Error}  404 - Origin Not found
+ */
+router.route('/origins/:idOrigin').get(function async(req,res){
+    origin.findById(req.params.idOrigin, function(err, origin) {
+        if (err)
+            res.status(404).json(err);
+        res.status(200).json(origin);
+    });
+});
+
+/**
+ * Get a Prime by id
+ * @route GET /primes/{idPrime}
+ * @group prime - Operations about prime
+ * @param {string} idPrime.path.required - The id of the prime we are looking for
+ * @returns {object} 200 - A prime
+ * @returns {Error}  404 - Prime Not found
+ */
+router.route('/primes/:idPrime').get(function async(req,res){
+    prime.findById(req.params.idPrime, function(err, prime) {
+        if (err)
+            res.status(404).json(err);
+        res.status(200).json(prime);
+    });
+});
+
+/**
+ * Get a Professor by id
+ * @route GET /professors/{idProfessor}
+ * @group professor - Operations about prime
+ * @param {string} idProfessor.path.required - The id of the professor we are looking for
+ * @returns {object} 200 - A professor
+ * @returns {Error}  404 - Professor Not found
+ */
+router.route('/professors/:idProfessor').get(function async(req,res){
+    professor.findById(req.params.idProfessor, function(err, professor) {
+        if (err)
+            res.status(404).json(err);
+        res.status(200).json(professor);
+    });
+});
+
+/**
+ * Get a Spinneret by id
+ * @route GET /spinnerets/{idSpinneret}
+ * @group spinneret - Operations about Spinneret
+ * @param {string} idSpinneret.path.required - The id of the spinneret we are looking for
+ * @returns {object} 200 - A spinneret
+ * @returns {Error}  404 - Spinneret Not found
+ */
+router.route('/spinnerets/:idSpinneret').get(function async(req,res){
+    spinneret.findById(req.params.idSpinneret, function(err, spinneret) {
+        if (err)
+            res.status(404).json(err);
+        res.status(200).json(spinneret);
+    });
+});
+
+/**
+ * Get a Status by id
+ * @route GET /status/{idStatus}
+ * @group status - Operations about Status
+ * @param {string} idStatus.path.required - The id of the status we are looking for
+ * @returns {object} 200 - A status
+ * @returns {Error}  404 - Status Not found
+ */
+router.route('/status/:idStatus').get(function async(req,res){
+    status.findById(req.params.idStatus, function(err, status) {
+        if (err)
+            res.status(404).json(err);
+        res.status(200).json(status);
+    });
+});
+
+/**
+ * Get a User by id
+ * @route GET /users/{idUser}
+ * @group user - Operations about User
+ * @param {string} idUser.path.required - The id of the user we are looking for
+ * @returns {object} 200 - A user
+ * @returns {Error}  404 - User Not found
+ */
+router.route('/users/:idUser').get(function async(req,res){
+    user.findById(req.params.idUser, function(err, user) {
+        if (err)
+            res.status(404).json(err);
+        res.status(200).json(user);
+    });
+});
 
 // ----------------------------
 // ---------[UPDATE]-----------
@@ -455,7 +598,7 @@ router.delete("/professor/:idProfessor", async (req, res) => {
         res.status(404)
         res.send({ error: "404" })
     }
-})
+});
 
 /**
  * Delete status
@@ -473,7 +616,7 @@ router.delete("/status/:idStatus", async (req, res) => {
         res.status(404)
         res.send({ error: "404" })
     }
-})
+});
 
 /**
  * Delete prime
@@ -491,7 +634,7 @@ router.delete("/prime/:idPrime", async (req, res) => {
         res.status(404)
         res.send({ error: "404" })
     }
-})
+});
 
 /**
  * Delete group
@@ -509,7 +652,7 @@ router.delete("/group/:idGroup", async (req, res) => {
         res.status(404)
         res.send({ error: "404" })
     }
-})
+});
 
 /**
  * Delete origin
@@ -527,7 +670,7 @@ router.delete("/origin/:idOrigin", async (req, res) => {
         res.status(404)
         res.send({ error: "404" })
     }
-})
+});
 
 /**
  * Delete discharge
@@ -545,15 +688,15 @@ router.delete("/discharge/:idDischarge", async (req, res) => {
         res.status(404)
         res.send({ error: "404" })
     }
-})
+});
 
 /**
  * Delete course
  * @route DELETE /course/{idCourse}
  * @group course - Operations about course
  * @param {string} idCourse.path.required - The id of the course to be deleted
- * @returns {object} 200 - course deleted
- * @returns {Error}  404 - course not found
+ * @returns {object} 200 - Course deleted
+ * @returns {Error}  404 - Course not found
  */
 router.delete("/course/:idCourse", async (req, res) => {
     try {
@@ -563,8 +706,7 @@ router.delete("/course/:idCourse", async (req, res) => {
         res.status(404)
         res.send({ error: "404" })
     }
-})
-
+});
 
 // ----------------------------
 // ----------------------------
