@@ -12,6 +12,7 @@ const user = require('../schemas/user.js');
 const prime = require('../schemas/prime.js');
 const origin = require('../schemas/origin.js');
 const course = require('../schemas/course.js');
+const discharge = require('../schemas/discharge.js');
 
 // ----------------------------
 // ----------[SCHEMAS]---------
@@ -70,6 +71,11 @@ const course = require('../schemas/course.js');
 
 /**
  * @typedef course
+ * @property {string} name
+ */
+
+/**
+ * @typedef discharge
  * @property {string} name
  */
 
@@ -157,6 +163,22 @@ router.post("/origin",async (req,res)=>{
     })
 });
 
+/**
+ * Add a new discharge
+ * @route POST /discharge
+ * @group discharge - Operations about discharge
+ * @returns {discharge.model} 201 - A new discharge is added
+ * @returns {Error}  400 -  Bad Request
+ */
+router.post("/discharge",async (req,res)=>{
+    let newDischarge = new discharge(req.body);
+    await newDischarge.save().then((result)=>{
+        res.status(201).json({ NewDischarge : "201 => " + newDischarge._id})
+    },(err)=>{
+        res.status(400).json(err)
+    })
+});
+
 // ----------------------------
 // -----------[GET]------------
 // ----------------------------
@@ -230,6 +252,21 @@ router.get("/groups",async (req,res)=>{
  */
 router.get("/origins",async (req,res)=>{
     await origin.find({}).then((result)=>{
+        res.status(200).json(result)
+    },(err)=>{
+        res.status(404).json(err)
+    })
+});
+
+/**
+ * Get all discharges
+ * @route GET /discharges
+ * @group discharge - Operations about discharge
+ * @returns {object} 200 - All Discharges
+ * @returns {Error}  404 - Discharges Not found
+ */
+router.get("/discharges",async (req,res)=>{
+    await discharge.find({}).then((result)=>{
         res.status(200).json(result)
     },(err)=>{
         res.status(404).json(err)
@@ -324,9 +361,27 @@ router.put('/origin/:idOrigin', async (req, res) => {
     try {
         await origin.findByIdAndUpdate(req.params.idOrigin, req.body)
         await origin.save()
-        res.status(200).json({ Result : "200 - Group updated"})
+        res.status(200).json({ Result : "200 - Origin updated"})
     } catch (err) {
-        res.status(204).json({ Result : "204 - Group not updated"})
+        res.status(204).json({ Result : "204 - Origin not updated"})
+    }
+});
+
+/**
+ * Update a discharge
+ * @route PUT /discharge/{idDischarge}
+ * @group discharge - Operations about discharge
+ * @param {string} idDischarge.path.required - The id of the discharge you want to update
+ * @returns {object} 200 - Discharge updated
+ * @returns {Error}  default - Unexpected error
+ */
+router.put('/discharge/:idDischarge', async (req, res) => {
+    try {
+        await discharge.findByIdAndUpdate(req.params.idDischarge, req.body)
+        await discharge.save()
+        res.status(200).json({ Result : "200 - Discharge updated"})
+    } catch (err) {
+        res.status(204).json({ Result : "204 - Discharge not updated"})
     }
 });
 
@@ -414,9 +469,27 @@ router.delete("/group/:idGroup", async (req, res) => {
  * @returns {object} 200 - origin deleted
  * @returns {Error}  404 - origin not found
  */
-router.delete("/group/:idOrigin", async (req, res) => {
+router.delete("/origin/:idOrigin", async (req, res) => {
     try {
-        await group.deleteOne({ _id: req.params.idOrigin })
+        await origin.deleteOne({ _id: req.params.idOrigin })
+        res.status(200).send()
+    } catch {
+        res.status(404)
+        res.send({ error: "404" })
+    }
+})
+
+/**
+ * Delete discharge
+ * @route DELETE /discharge/{idDischarge}
+ * @group discharge - Operations about discharge
+ * @param {string} idDischarge.path.required - The id of the discharge to be deleted
+ * @returns {object} 200 - discharge deleted
+ * @returns {Error}  404 - discharge not found
+ */
+router.delete("/discharge/:idDischarge", async (req, res) => {
+    try {
+        await discharge.deleteOne({ _id: req.params.idDischarge })
         res.status(200).send()
     } catch {
         res.status(404)
