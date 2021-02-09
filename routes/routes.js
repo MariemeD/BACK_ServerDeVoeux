@@ -179,6 +179,22 @@ router.post("/discharge",async (req,res)=>{
     })
 });
 
+/**
+ * Add a new course
+ * @route POST /course
+ * @group course - Operations about course
+ * @returns {course.model} 201 - A new course is added
+ * @returns {Error}  400 -  Bad Request
+ */
+router.post("/course",async (req,res)=>{
+    let newCourse = new course(req.body);
+    await newCourse.save().then((result)=>{
+        res.status(201).json({ NewCourse : "201 => " + newCourse._id})
+    },(err)=>{
+        res.status(400).json(err)
+    })
+});
+
 // ----------------------------
 // -----------[GET]------------
 // ----------------------------
@@ -272,6 +288,22 @@ router.get("/discharges",async (req,res)=>{
         res.status(404).json(err)
     })
 });
+
+/**
+ * Get all courses
+ * @route GET /courses
+ * @group course - Operations about course
+ * @returns {object} 200 - All Courses
+ * @returns {Error}  404 - Courses Not found
+ */
+router.get("/courses",async (req,res)=>{
+    await course.find({}).then((result)=>{
+        res.status(200).json(result)
+    },(err)=>{
+        res.status(404).json(err)
+    })
+});
+
 
 // ----------------------------
 // ---------[UPDATE]-----------
@@ -382,6 +414,24 @@ router.put('/discharge/:idDischarge', async (req, res) => {
         res.status(200).json({ Result : "200 - Discharge updated"})
     } catch (err) {
         res.status(204).json({ Result : "204 - Discharge not updated"})
+    }
+});
+
+/**
+ * Update a course
+ * @route PUT /course/{idCourse}
+ * @group course - Operations about course
+ * @param {string} idCourse.path.required - The id of the course you want to update
+ * @returns {object} 200 - Course updated
+ * @returns {Error}  default - Unexpected error
+ */
+router.put('/course/:idCourse', async (req, res) => {
+    try {
+        await course.findByIdAndUpdate(req.params.idCourse, req.body)
+        await course.save()
+        res.status(200).json({ Result : "200 - Course updated"})
+    } catch (err) {
+        res.status(204).json({ Result : "204 - Course not updated"})
     }
 });
 
@@ -496,6 +546,25 @@ router.delete("/discharge/:idDischarge", async (req, res) => {
         res.send({ error: "404" })
     }
 })
+
+/**
+ * Delete course
+ * @route DELETE /course/{idCourse}
+ * @group course - Operations about course
+ * @param {string} idCourse.path.required - The id of the course to be deleted
+ * @returns {object} 200 - course deleted
+ * @returns {Error}  404 - course not found
+ */
+router.delete("/course/:idCourse", async (req, res) => {
+    try {
+        await course.deleteOne({ _id: req.params.idCourse })
+        res.status(200).send()
+    } catch {
+        res.status(404)
+        res.send({ error: "404" })
+    }
+})
+
 
 // ----------------------------
 // ----------------------------
