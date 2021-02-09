@@ -76,6 +76,22 @@ const discharge = require('../schemas/discharge.js');
 // ----------------------------
 
 /**
+ * Add a new user
+ * @route POST /user
+ * @group user - Operations about user
+ * @returns {user.model} 201 - A new user is added
+ * @returns {Error}  400 -  Bad Request
+ */
+router.post("/user",async (req,res)=>{
+    let newUser = new user(req.body);
+    await newUser.save().then((result)=>{
+        res.status(201).json({ NewUser : "201 => " + newUser._id})
+    },(err)=>{
+        res.status(400).json(err)
+    })
+});
+
+/**
  * Add a new professor
  * @route POST /professor
  * @group professor - Operations about professor
@@ -192,6 +208,21 @@ router.post("/course",async (req,res)=>{
 // ----------------------------
 
 /**
+ * Get all users
+ * @route GET /users
+ * @group user - Operations about user
+ * @returns {object} 200 - All users
+ * @returns {Error}  404 - Users Not found
+ */
+router.get("/users",async (req,res)=>{
+    await user.find({}).then((result)=>{
+        res.status(200).json(result)
+    },(err)=>{
+        res.status(404).json(err)
+    })
+});
+
+/**
  * Get all professors
  * @route GET /professors
  * @group professor - Operations about professor
@@ -298,13 +329,13 @@ router.get("/courses",async (req,res)=>{
 
 /**
  * Get a Course by id
- * @route GET /courses/{idCourse}
+ * @route GET /course/{idCourse}
  * @group course - Operations about course
  * @param {string} idCourse.path.required - The id of the course we are looking for
  * @returns {object} 200 - A course
  * @returns {Error}  404 - Course Not found
  */
-router.route('/courses/:idCourse').get(function async(req,res){
+router.route('/course/:idCourse').get(function async(req,res){
     course.findById(req.params.idCourse, function(err, course) {
         if (err)
             res.status(404).json(err);
@@ -314,13 +345,13 @@ router.route('/courses/:idCourse').get(function async(req,res){
 
 /**
  * Get a Discharge by id
- * @route GET /discharges/{idDischarge}
+ * @route GET /discharge/{idDischarge}
  * @group discharge - Operations about discharge
  * @param {string} idDischarge.path.required - The id of the discharge we are looking for
  * @returns {object} 200 - A discharge
  * @returns {Error}  404 - Discharge Not found
  */
-router.route('/discharges/:idDischarge').get(function async(req,res){
+router.route('/discharge/:idDischarge').get(function async(req,res){
     discharge.findById(req.params.idDischarge, function(err, discharge) {
         if (err)
             res.status(404).json(err);
@@ -330,13 +361,13 @@ router.route('/discharges/:idDischarge').get(function async(req,res){
 
 /**
  * Get a Group by id
- * @route GET /groups/{idGroup}
+ * @route GET /group/{idGroup}
  * @group group - Operations about group
  * @param {string} idGroup.path.required - The id of the group we are looking for
  * @returns {object} 200 - A group
  * @returns {Error}  404 - Group Not found
  */
-router.route('/groups/:idGroup').get(function async(req,res){
+router.route('/group/:idGroup').get(function async(req,res){
     group.findById(req.params.idGroup, function(err, group) {
         if (err)
             res.status(404).json(err);
@@ -346,13 +377,13 @@ router.route('/groups/:idGroup').get(function async(req,res){
 
 /**
  * Get a Origin by id
- * @route GET /origins/{idOrigin}
+ * @route GET /origin/{idOrigin}
  * @group origin - Operations about origin
  * @param {string} idOrigin.path.required - The id of the origin we are looking for
  * @returns {object} 200 - A origin
  * @returns {Error}  404 - Origin Not found
  */
-router.route('/origins/:idOrigin').get(function async(req,res){
+router.route('/origin/:idOrigin').get(function async(req,res){
     origin.findById(req.params.idOrigin, function(err, origin) {
         if (err)
             res.status(404).json(err);
@@ -362,13 +393,13 @@ router.route('/origins/:idOrigin').get(function async(req,res){
 
 /**
  * Get a Prime by id
- * @route GET /primes/{idPrime}
+ * @route GET /prime/{idPrime}
  * @group prime - Operations about prime
  * @param {string} idPrime.path.required - The id of the prime we are looking for
  * @returns {object} 200 - A prime
  * @returns {Error}  404 - Prime Not found
  */
-router.route('/primes/:idPrime').get(function async(req,res){
+router.route('/prime/:idPrime').get(function async(req,res){
     prime.findById(req.params.idPrime, function(err, prime) {
         if (err)
             res.status(404).json(err);
@@ -378,13 +409,13 @@ router.route('/primes/:idPrime').get(function async(req,res){
 
 /**
  * Get a Professor by id
- * @route GET /professors/{idProfessor}
+ * @route GET /professor/{idProfessor}
  * @group professor - Operations about prime
  * @param {string} idProfessor.path.required - The id of the professor we are looking for
  * @returns {object} 200 - A professor
  * @returns {Error}  404 - Professor Not found
  */
-router.route('/professors/:idProfessor').get(function async(req,res){
+router.route('/professor/:idProfessor').get(function async(req,res){
     professor.findById(req.params.idProfessor, function(err, professor) {
         if (err)
             res.status(404).json(err);
@@ -410,13 +441,13 @@ router.route('/status/:idStatus').get(function async(req,res){
 
 /**
  * Get a User by id
- * @route GET /users/{idUser}
+ * @route GET /user/{idUser}
  * @group user - Operations about User
  * @param {string} idUser.path.required - The id of the user we are looking for
  * @returns {object} 200 - A user
  * @returns {Error}  404 - User Not found
  */
-router.route('/users/:idUser').get(function async(req,res){
+router.route('/user/:idUser').get(function async(req,res){
     user.findById(req.params.idUser, function(err, user) {
         if (err)
             res.status(404).json(err);
@@ -427,6 +458,27 @@ router.route('/users/:idUser').get(function async(req,res){
 // ----------------------------
 // ---------[UPDATE]-----------
 // ----------------------------
+
+/**
+ * Update user password
+ * @route PUT /user/{idUser}
+ * @group user - Operations about user
+ * @param {string} idUser.path.required - email
+ * @returns {object} 200 - user updated
+ * @returns {Error}  default - Unexpected error
+ */
+router.put('/user/:idUser', async function(req, res) {
+    const salt = await bcrypt.genSalt(10);
+    const password = await bcrypt.hash(req.body.password, salt);
+    user.findByIdAndUpdate(req.params.idUser,
+        {password: password}, function(err, data) {
+            if (err) {
+                res.status(204).json({ Result : "204 - Password not changed"})
+            } else {
+                res.status(200).json({ Result : "200 - Password changed"})
+            }
+        });
+});
 
 /**
  * Update a professor
@@ -557,6 +609,24 @@ router.put('/course/:idCourse', async (req, res) => {
 // ----------------------------
 // ----------[DELETE]----------
 // ----------------------------
+
+/**
+ * Delete user
+ * @route DELETE /user/{idUser}
+ * @group user - Operations about user
+ * @param {string} idUser.path.required - The id of the user to be deleted
+ * @returns {object} 200 - user deleted
+ * @returns {Error}  404 - user not found
+ */
+router.delete("/user/:idUser", async (req, res) => {
+    try {
+        await user.deleteOne({ _id: req.params.idUser })
+        res.status(200).send()
+    } catch {
+        res.status(404)
+        res.send({ error: "404" })
+    }
+});
 
 /**
  * Delete professor
