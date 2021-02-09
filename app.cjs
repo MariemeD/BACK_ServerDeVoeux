@@ -52,11 +52,11 @@ app.use('/api', routes);
 mongoose.connect(
     connexionChain, { useUnifiedTopology: true, useNewUrlParser: true  })
     .then(client => {
-        console.log('Base de données : OK');
+        console.log('Connexion Base de données : OK');
     });
 
 expressSwagger(options);
 
 app.listen(process.env.PORT || 3000, function() {
-    console.log('Server : OK');
+    console.log('Connexion Server : OK');
 })
