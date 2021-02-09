@@ -6,7 +6,6 @@ const express = require('express');
 const router = express.Router();
 const group = require('../schemas/group.js');
 const professor = require('../schemas/professor.js');
-const spinneret = require('../schemas/spinneret.js');
 const status = require('../schemas/status.js');
 const user = require('../schemas/user.js');
 const prime = require('../schemas/prime.js');
@@ -35,13 +34,6 @@ const discharge = require('../schemas/discharge.js');
  * @property {number} hoursDone
  * @property {date} lastConnection
  * @property {date} lastWishUpdate
- * @property {array} modules
- */
-
-/**
- * @typedef spinneret
- * @property {string} name
- * @property {string} idgroup
  * @property {array} modules
  */
 
@@ -397,22 +389,6 @@ router.route('/professors/:idProfessor').get(function async(req,res){
         if (err)
             res.status(404).json(err);
         res.status(200).json(professor);
-    });
-});
-
-/**
- * Get a Spinneret by id
- * @route GET /spinnerets/{idSpinneret}
- * @group spinneret - Operations about Spinneret
- * @param {string} idSpinneret.path.required - The id of the spinneret we are looking for
- * @returns {object} 200 - A spinneret
- * @returns {Error}  404 - Spinneret Not found
- */
-router.route('/spinnerets/:idSpinneret').get(function async(req,res){
-    spinneret.findById(req.params.idSpinneret, function(err, spinneret) {
-        if (err)
-            res.status(404).json(err);
-        res.status(200).json(spinneret);
     });
 });
 
