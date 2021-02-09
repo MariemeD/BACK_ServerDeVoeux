@@ -13,7 +13,6 @@ const prime = require('../schemas/prime.js');
 const origin = require('../schemas/origin.js');
 const course = require('../schemas/course.js');
 
-
 // ----------------------------
 // ----------[SCHEMAS]---------
 // ----------------------------
@@ -142,6 +141,22 @@ router.post("/group",async (req,res)=>{
     })
 });
 
+/**
+ * Add a new origin
+ * @route POST /origin
+ * @group origin - Operations about origin
+ * @returns {origin.model} 201 - A new origin is added
+ * @returns {Error}  400 -  Bad Request
+ */
+router.post("/origin",async (req,res)=>{
+    let newOrigin = new origin(req.body);
+    await newOrigin.save().then((result)=>{
+        res.status(201).json({ NewOrigin : "201 => " + newOrigin._id})
+    },(err)=>{
+        res.status(400).json(err)
+    })
+});
+
 // ----------------------------
 // -----------[GET]------------
 // ----------------------------
@@ -200,6 +215,21 @@ router.get("/primes",async (req,res)=>{
  */
 router.get("/groups",async (req,res)=>{
     await group.find({}).then((result)=>{
+        res.status(200).json(result)
+    },(err)=>{
+        res.status(404).json(err)
+    })
+});
+
+/**
+ * Get all origins
+ * @route GET /origins
+ * @group origin - Operations about origin
+ * @returns {object} 200 - All Origins
+ * @returns {Error}  404 - Origins Not found
+ */
+router.get("/origins",async (req,res)=>{
+    await origin.find({}).then((result)=>{
         res.status(200).json(result)
     },(err)=>{
         res.status(404).json(err)
@@ -282,6 +312,24 @@ router.put('/group/:idGroup', async (req, res) => {
     }
 });
 
+/**
+ * Update a origin
+ * @route PUT /origin/{idOrigin}
+ * @group origin - Operations about origin
+ * @param {string} idOrigin.path.required - The id of the origin you want to update
+ * @returns {object} 200 - Origin updated
+ * @returns {Error}  default - Unexpected error
+ */
+router.put('/origin/:idOrigin', async (req, res) => {
+    try {
+        await origin.findByIdAndUpdate(req.params.idOrigin, req.body)
+        await origin.save()
+        res.status(200).json({ Result : "200 - Group updated"})
+    } catch (err) {
+        res.status(204).json({ Result : "204 - Group not updated"})
+    }
+});
+
 // ----------------------------
 // ----------[DELETE]----------
 // ----------------------------
@@ -351,6 +399,24 @@ router.delete("/prime/:idPrime", async (req, res) => {
 router.delete("/group/:idGroup", async (req, res) => {
     try {
         await group.deleteOne({ _id: req.params.idGroup })
+        res.status(200).send()
+    } catch {
+        res.status(404)
+        res.send({ error: "404" })
+    }
+})
+
+/**
+ * Delete origin
+ * @route DELETE /origin/{idOrigin}
+ * @group origin - Operations about origin
+ * @param {string} idOrigin.path.required - The id of the origin to be deleted
+ * @returns {object} 200 - origin deleted
+ * @returns {Error}  404 - origin not found
+ */
+router.delete("/group/:idOrigin", async (req, res) => {
+    try {
+        await group.deleteOne({ _id: req.params.idOrigin })
         res.status(200).send()
     } catch {
         res.status(404)
