@@ -12,6 +12,8 @@ const prime = require('../schemas/prime.js');
 const origin = require('../schemas/origin.js');
 const course = require('../schemas/course.js');
 const discharge = require('../schemas/discharge.js');
+const request = require('../schemas/request.js');
+
 
 // ----------------------------
 // ----------[SCHEMAS]---------
@@ -64,11 +66,23 @@ const discharge = require('../schemas/discharge.js');
 /**
  * @typedef course
  * @property {string} name
+ * @property {string} type
+ * @property {string} professor
  */
 
 /**
  * @typedef discharge
  * @property {string} name
+ */
+
+/**
+ * @typedef request
+ * @property {string} requestor
+ * @property {string} emailRequestor
+ * @property {string} detailRequest
+ * @property {string} groupRequested
+ * @property {string} courseRequested
+ * @property {boolean} response
  */
 
 // ----------------------------
@@ -203,6 +217,22 @@ router.post("/course",async (req,res)=>{
     })
 });
 
+/**
+ * Add a new request
+ * @route POST /request
+ * @group request - Operations about request
+ * @returns {request.model} 201 - A new request is added
+ * @returns {Error}  400 -  Bad Request
+ */
+router.post("/request",async (req,res)=>{
+    let newRequest = new request(req.body);
+    await newRequest.save().then((result)=>{
+        res.status(201).json({ NewRequest : "201 => " + newRequest._id})
+    },(err)=>{
+        res.status(400).json(err)
+    })
+});
+
 // ----------------------------
 // -----------[GET]------------
 // ----------------------------
@@ -321,6 +351,21 @@ router.get("/discharges",async (req,res)=>{
  */
 router.get("/courses",async (req,res)=>{
     await course.find({}).then((result)=>{
+        res.status(200).json(result)
+    },(err)=>{
+        res.status(404).json(err)
+    })
+});
+
+/**
+ * Get all request
+ * @route GET /requests
+ * @group request - Operations about request
+ * @returns {object} 200 - All Requests
+ * @returns {Error}  404 - Requests Not found
+ */
+router.get("/requests",async (req,res)=>{
+    await request.find({}).then((result)=>{
         res.status(200).json(result)
     },(err)=>{
         res.status(404).json(err)
@@ -451,6 +496,22 @@ router.route('/user/:idUser').get(function async(req,res){
     user.findById(req.params.idUser, function(err, user) {
         if (err)
             res.status(404).json(err);
+        res.status(200).json(user);
+    });
+});
+
+/**
+ * Get a Request by id
+ * @route GET /request/{idRequest}
+ * @group request - Operations about Request
+ * @param {string} idRequest.path.required - The id of the request we are looking for
+ * @returns {object} 200 - A request
+ * @returns {Error}  404 - Request Not found
+ */
+router.route('/request/:idRequest').get(function async(req,res){
+    request.findById(req.params.idRequest, function(err, request) {
+        if (err)
+            res.status(404).json(request);
         res.status(200).json(user);
     });
 });
@@ -606,6 +667,24 @@ router.put('/course/:idCourse', async (req, res) => {
     }
 });
 
+/**
+ * Update a request
+ * @route PUT /request/{idRequest}
+ * @group request - Operations about request
+ * @param {string} idRequest.path.required - The id of the request you want to update
+ * @returns {object} 200 - Request updated
+ * @returns {Error}  default - Unexpected error
+ */
+router.put('/request/:idRequest', async (req, res) => {
+    try {
+        await request.findByIdAndUpdate(req.params.idRequest, req.body)
+        await request.save()
+        res.status(200).json({ Result : "200 - Request updated"})
+    } catch (err) {
+        res.status(204).json({ Result : "204 - request not updated"})
+    }
+});
+
 // ----------------------------
 // ----------[DELETE]----------
 // ----------------------------
@@ -747,6 +826,24 @@ router.delete("/discharge/:idDischarge", async (req, res) => {
 router.delete("/course/:idCourse", async (req, res) => {
     try {
         await course.deleteOne({ _id: req.params.idCourse })
+        res.status(200).send()
+    } catch {
+        res.status(404)
+        res.send({ error: "404" })
+    }
+});
+
+/**
+ * Delete request
+ * @route DELETE /request/{idRequest}
+ * @group request - Operations about request
+ * @param {string} idRequest.path.required - The id of the request to be deleted
+ * @returns {object} 200 - Request deleted
+ * @returns {Error}  404 - Request not found
+ */
+router.delete("/request/:idRequest", async (req, res) => {
+    try {
+        await request.deleteOne({ _id: req.params.idRequest })
         res.status(200).send()
     } catch {
         res.status(404)
