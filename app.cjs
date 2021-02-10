@@ -11,7 +11,7 @@ let options = {
     swaggerDefinition: {
         info: {
             description: 'SDV API CRUD : Marion L, Soukayna M, Lauraine H, Marieme D',
-            title: 'Swagger API Serveur de Voeux',
+            title: 'Swagger API Serveur de Voeux Département Informatique EVRY',
             version: '1.0.0',
         },
         host: 'back-serverdevoeux.herokuapp.com',
