@@ -14,7 +14,7 @@ let options = {
             title: 'Swagger API Serveur de Voeux',
             version: '1.0.0',
         },
-        host: 'https://back-serverdevoeux.herokuapp.com',
+        host: 'back-serverdevoeux.herokuapp.com',
         basePath: '/api',
         produces: [
             "application/json",
