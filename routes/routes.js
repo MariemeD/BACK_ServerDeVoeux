@@ -13,7 +13,9 @@ const origin = require('../schemas/origin.js');
 const course = require('../schemas/course.js');
 const discharge = require('../schemas/discharge.js');
 const request = require('../schemas/request.js');
+const responsible = require('../schemas/responsible.js');
 
+const bcrypt =require('bcrypt');
 
 // ----------------------------
 // ----------[SCHEMAS]---------
@@ -85,6 +87,15 @@ const request = require('../schemas/request.js');
  * @property {boolean} response
  */
 
+/**
+ * @typedef responsible
+ * @property {string} firstname
+ * @property {string} lastname
+ * @property {string} professorID
+ * @property {string} email
+ * @property {string} group
+ */
+
 // ----------------------------
 // -----------[POST]-----------
 // ----------------------------
@@ -94,15 +105,46 @@ const request = require('../schemas/request.js');
  * @route POST /user
  * @group user - Operations about user
  * @returns {user.model} 201 - A new user is added
- * @returns {Error}  400 -  Bad Request
+ * @returns {Error}  400 - Bad request
  */
 router.post("/user",async (req,res)=>{
-    let newUser = new user(req.body);
-    await newUser.save().then((result)=>{
-        res.status(201).json({ NewUser : "201 => " + newUser._id})
-    },(err)=>{
-        res.status(400).json(err)
-    })
+    const isUsernameExist = await user.findOne({ email: req.body.email });
+    const isProfessorExist = await professor.findOne({ professorNumber: req.body.username });
+    if ( isProfessorExist === null){
+        return res.status(401).json({ error: "Can't sign up" });
+    }
+    else if ( isStudentExist === null && req.body.type === "student"){
+        return res.status(401).json({ error: "Can't sign up" });
+    }
+    else if(isUsernameExist) {
+        return res.status(401).json({ error: "Email already exists" });
+    }
+    else{
+        const salt = await bcrypt.genSalt(10);
+        const password = await bcrypt.hash(req.body.password, salt);
+        let newUser = new user(req.body);
+        newUser.password = password;
+        await newUser.save().then((result)=>{
+            res.status(201).json({ NewUser : "201 => https://cpel.herokuapp.com/api/professors/"+newUser._id})
+        },(err)=>{
+            res.status(401).json(err)
+        })
+    }
+});
+
+/**
+ * LOGIN
+ * @route POST /login
+ * @group user - Operations about user
+ * @returns {user.model} 201 - Success
+ * @returns {Error}  400 -  Echec
+ */
+router.get("/login/:email/:password", async (req, res) => {
+    const userLogin = await user.findOne({ email: req.params.email });
+    if (!userLogin) return res.status(401).json({ error: "Nom d'utilisateur incorrect" });
+    const validPassword = await bcrypt.compare(req.params.password, userLogin.password);
+    if (!validPassword) return res.status(401).json({ error: "Mot de passe incorrect" });
+    res.status(200).json({userLogin})
 });
 
 /**
@@ -228,6 +270,22 @@ router.post("/request",async (req,res)=>{
     let newRequest = new request(req.body);
     await newRequest.save().then((result)=>{
         res.status(201).json({ NewRequest : "201 => " + newRequest._id})
+    },(err)=>{
+        res.status(400).json(err)
+    })
+});
+
+/**
+ * Add a new responsible
+ * @route POST /responsible
+ * @group responsible - Operations about responsible
+ * @returns {responsible.model} 201 - A new responsible is added
+ * @returns {Error}  400 -  Bad Request
+ */
+router.post("/responsible",async (req,res)=>{
+    let newResponsible = new responsible(req.body);
+    await newResponsible.save().then((result)=>{
+        res.status(201).json({ NewResponsible : "201 => " + newResponsible._id})
     },(err)=>{
         res.status(400).json(err)
     })
@@ -366,6 +424,21 @@ router.get("/courses",async (req,res)=>{
  */
 router.get("/requests",async (req,res)=>{
     await request.find({}).then((result)=>{
+        res.status(200).json(result)
+    },(err)=>{
+        res.status(404).json(err)
+    })
+});
+
+/**
+ * Get all responsibles
+ * @route GET /responsibles
+ * @group responsible - Operations about responsible
+ * @returns {object} 200 - All responsibles
+ * @returns {Error}  404 - Responsibles Not found
+ */
+router.get("/responsibles",async (req,res)=>{
+    await responsible.find({}).then((result)=>{
         res.status(200).json(result)
     },(err)=>{
         res.status(404).json(err)
@@ -512,7 +585,23 @@ router.route('/request/:idRequest').get(function async(req,res){
     request.findById(req.params.idRequest, function(err, request) {
         if (err)
             res.status(404).json(request);
-        res.status(200).json(user);
+        res.status(200).json(request);
+    });
+});
+
+/**
+ * Get a Responsible by id
+ * @route GET /responsible/{idResponsible}
+ * @group responsible - Operations about Responsible
+ * @param {string} idResponsible.path.required - The id of the responsible we are looking for
+ * @returns {object} 200 - A responsible
+ * @returns {Error}  404 - Responsible Not found
+ */
+router.route('/responsible/:idResponsible').get(function async(req,res){
+    responsible.findById(req.params.idResponsible, function(err, responsible) {
+        if (err)
+            res.status(404).json(responsible);
+        res.status(200).json(responsible);
     });
 });
 
@@ -685,6 +774,24 @@ router.put('/request/:idRequest', async (req, res) => {
     }
 });
 
+/**
+ * Update a responsible
+ * @route PUT /responsible/{idResponsible}
+ * @group responsible - Operations about responsible
+ * @param {string} idResponsible.path.required - The id of the responsible you want to update
+ * @returns {object} 200 - Responsible updated
+ * @returns {Error}  default - Unexpected error
+ */
+router.put('/responsible/:idResponsible', async (req, res) => {
+    try {
+        await responsible.findByIdAndUpdate(req.params.idResponsible, req.body)
+        await responsible.save()
+        res.status(200).json({ Result : "200 - Responsible updated"})
+    } catch (err) {
+        res.status(204).json({ Result : "204 - Responsible not updated"})
+    }
+});
+
 // ----------------------------
 // ----------[DELETE]----------
 // ----------------------------
@@ -844,6 +951,24 @@ router.delete("/course/:idCourse", async (req, res) => {
 router.delete("/request/:idRequest", async (req, res) => {
     try {
         await request.deleteOne({ _id: req.params.idRequest })
+        res.status(200).send()
+    } catch {
+        res.status(404)
+        res.send({ error: "404" })
+    }
+});
+
+/**
+ * Delete responsible
+ * @route DELETE /responsible/{idResponsible}
+ * @group responsible - Operations about responsible
+ * @param {string} idResponsible.path.required - The id of the responsible to be deleted
+ * @returns {object} 200 - Responsible deleted
+ * @returns {Error}  404 - Responsible not found
+ */
+router.delete("/responsible/:idResponsible", async (req, res) => {
+    try {
+        await responsible.deleteOne({ _id: req.params.idResponsible})
         res.status(200).send()
     } catch {
         res.status(404)

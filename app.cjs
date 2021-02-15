@@ -6,6 +6,9 @@ const mongoose = require('mongoose');
 const connexionChain = 'mongodb+srv://USER_SDV:serveurdevoeux@cluster0.fdsvw.mongodb.net/SDV?retryWrites=true&w=majority'
 const routes = require('./routes/routes');
 const expressSwagger = require('express-swagger-generator')(app);
+const cors = require('cors');
+
+
 mongoose.set('useFindAndModify', false);
 let options = {
     swaggerDefinition: {
@@ -38,6 +41,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Accept, Authorization');
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -47,6 +51,7 @@ app.use(function (req, res, next) {
 app.use(bodyParser.json());
 app.use(express.json()) //
 app.use('/api', routes);
+app.use(cors());
 
 // Connexion base de données
 mongoose.connect(
