@@ -70,11 +70,17 @@ const bcrypt =require('bcrypt');
  * @property {string} name
  * @property {string} type
  * @property {string} professor
+ * @property {string} semester
+ * @property {boolean} covered
  */
 
 /**
  * @typedef discharge
  * @property {string} name
+ * @property {string} object
+ * @property {string} hours
+ * @property {string} comment
+ * @property {string} professor
  */
 
 /**
@@ -84,7 +90,7 @@ const bcrypt =require('bcrypt');
  * @property {string} detailRequest
  * @property {string} groupRequested
  * @property {string} courseRequested
- * @property {boolean} response
+ * @property {string} status
  */
 
 /**
@@ -108,7 +114,7 @@ const bcrypt =require('bcrypt');
  * @returns {Error}  400 - Bad request
  */
 router.post("/user",async (req,res)=>{
-    let isProfessorExist = null;
+    let isProfessorExist
     const isUsernameExist = await user.findOne({ email: req.body.email });
     // console.log("Username Exist " + isUsernameExist);
     const isResponsible = await responsible.findOne({ email: req.body.email });
