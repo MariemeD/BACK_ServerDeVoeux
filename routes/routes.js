@@ -15,7 +15,7 @@ const discharge = require('../schemas/discharge.js');
 const request = require('../schemas/request.js');
 const responsible = require('../schemas/responsible.js');
 const fetch = require('node-fetch');
-const requestHTTPS = require("request");
+const requete = require("request");
 const axios = require("axios");
 const bcrypt =require('bcrypt');
 
@@ -317,7 +317,7 @@ router.get("/users",async (req,res)=>{
  * @returns {object} 200 - All Professors
  * @returns {Error}  404 - Professors Not found
  */
-router.get("/professors/:email",async (req,res)=>{
+router.get("/professors",async (req,res)=>{
     const url = "http://146.59.195.214:8006/api/v1/teachers/all";
     /*axios.get(url)
         .then((response) => {
@@ -328,7 +328,7 @@ router.get("/professors/:email",async (req,res)=>{
                 }
             }
         })*/
-    requestHTTPS.get(url, (error, response, body) => {
+    requete.get(url, (error, response, body) => {
         let json = JSON.parse(body);
         res.status(200).json(json)
     });
@@ -548,7 +548,6 @@ router.route('/professor/:email').get(function async(req,res){
         .then((response) => {
             for (let prof of response.data) {
                 if (prof.email === req.params.email) {
-                    console.log(prof);
                     res.status(200).json(prof)
                 }
             }
