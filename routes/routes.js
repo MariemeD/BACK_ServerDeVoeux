@@ -402,8 +402,6 @@ router.get("/discharges",async (req,res)=>{
  * @returns {Error}  404 - Courses Not found
  */
 
-http://146.59.195.214:8006/api/v1/events/matieres
-
 router.get("/courses",async (req,res)=>{
     axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
         .then((response) => {
