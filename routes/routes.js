@@ -110,24 +110,21 @@ const bcrypt =require('bcrypt');
 router.post("/user",async (req,res)=>{
     const isUsernameExist = await user.findOne({ email: req.body.email });
     const isResponsible = await responsible.findOne({ email: req.body.email });
-
-    /*if ( isProfessorExist === null){
+    const isProfessorExist = axios.get('http://146.59.195.214:8006/api/v1/teachers/all')
+        .then((response) => {
+            for (let prof of response.data) {
+                if (prof.email === req.body.email) {
+                    res.status(200).json(prof)
+                }
+            }
+        })
+    console.log(isProfessorExist);
+    if ( isProfessorExist === null){
         return res.status(401).json({ error: "Vous n'êtes pas autorisé à vous inscrire. Contactez l'administrateur" });
     }
     else if(isUsernameExist) {
         return res.status(401).json({ error: "Utilisateur déjà existant" });
     }
-    else{
-        const salt = await bcrypt.genSalt(10);
-        const password = await bcrypt.hash(req.body.password, salt);
-        let newUser = new user(req.body);
-        newUser.password = password;
-        await newUser.save().then((result)=>{
-            res.status(201).json({ NewUser : "201 => https://cpel.herokuapp.com/api/professors/"+newUser._id})
-        },(err)=>{
-            res.status(401).json(err)
-        })
-    }*/
 });
 
 /**
@@ -404,12 +401,19 @@ router.get("/discharges",async (req,res)=>{
  * @returns {object} 200 - All Courses
  * @returns {Error}  404 - Courses Not found
  */
+
+http://146.59.195.214:8006/api/v1/events/matieres
+
 router.get("/courses",async (req,res)=>{
-    await course.find({}).then((result)=>{
+    axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
+        .then((response) => {
+            res.status(200).json(response.data)
+        })
+    /*await course.find({}).then((result)=>{
         res.status(200).json(result)
     },(err)=>{
         res.status(404).json(err)
-    })
+    })*/
 });
 
 /**
