@@ -14,7 +14,9 @@ const course = require('../schemas/course.js');
 const discharge = require('../schemas/discharge.js');
 const request = require('../schemas/request.js');
 const responsible = require('../schemas/responsible.js');
-
+const fetch = require('node-fetch');
+const requestHTTPS = require("request");
+const axios = require("axios");
 const bcrypt =require('bcrypt');
 
 // ----------------------------
@@ -109,15 +111,13 @@ const bcrypt =require('bcrypt');
  */
 router.post("/user",async (req,res)=>{
     const isUsernameExist = await user.findOne({ email: req.body.email });
-    const isProfessorExist = await professor.findOne({ professorNumber: req.body.username });
-    if ( isProfessorExist === null){
-        return res.status(401).json({ error: "Can't sign up" });
-    }
-    else if ( isStudentExist === null && req.body.type === "student"){
-        return res.status(401).json({ error: "Can't sign up" });
+    const isResponsible = await responsible.findOne({ email: req.body.email });
+
+    /*if ( isProfessorExist === null){
+        return res.status(401).json({ error: "Vous n'êtes pas autorisé à vous inscrire. Contactez l'administrateur" });
     }
     else if(isUsernameExist) {
-        return res.status(401).json({ error: "Email already exists" });
+        return res.status(401).json({ error: "Utilisateur déjà existant" });
     }
     else{
         const salt = await bcrypt.genSalt(10);
@@ -129,7 +129,7 @@ router.post("/user",async (req,res)=>{
         },(err)=>{
             res.status(401).json(err)
         })
-    }
+    }*/
 });
 
 /**
@@ -317,12 +317,21 @@ router.get("/users",async (req,res)=>{
  * @returns {object} 200 - All Professors
  * @returns {Error}  404 - Professors Not found
  */
-router.get("/professors",async (req,res)=>{
-    await professor.find({}).then((result)=>{
-        res.status(200).json(result)
-    },(err)=>{
-        res.status(404).json(err)
-    })
+router.get("/professors/:email",async (req,res)=>{
+    const url = "http://146.59.195.214:8006/api/v1/teachers/all";
+    /*axios.get(url)
+        .then((response) => {
+            for (let prof of response.data) {
+                if (prof.email === req.params.email) {
+                    console.log(prof);
+                    res.status(200).json(prof)
+                }
+            }
+        })*/
+    requestHTTPS.get(url, (error, response, body) => {
+        let json = JSON.parse(body);
+        res.status(200).json(json)
+    });
 });
 
 /**
@@ -526,19 +535,24 @@ router.route('/prime/:idPrime').get(function async(req,res){
 });
 
 /**
- * Get a Professor by id
- * @route GET /professor/{idProfessor}
- * @group professor - Operations about prime
- * @param {string} idProfessor.path.required - The id of the professor we are looking for
+ * Get a Professor by email
+ * @route GET /professor/{email}
+ * @group professor - Operations about professor
+ * @param {string} email.path.required - The email of the professor we are looking for
  * @returns {object} 200 - A professor
  * @returns {Error}  404 - Professor Not found
  */
-router.route('/professor/:idProfessor').get(function async(req,res){
-    professor.findById(req.params.idProfessor, function(err, professor) {
-        if (err)
-            res.status(404).json(err);
-        res.status(200).json(professor);
-    });
+router.route('/professor/:email').get(function async(req,res){
+    const url = "http://146.59.195.214:8006/api/v1/teachers/all";
+    axios.get(url)
+        .then((response) => {
+            for (let prof of response.data) {
+                if (prof.email === req.params.email) {
+                    console.log(prof);
+                    res.status(200).json(prof)
+                }
+            }
+        })
 });
 
 /**
