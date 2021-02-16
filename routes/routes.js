@@ -14,8 +14,6 @@ const course = require('../schemas/course.js');
 const discharge = require('../schemas/discharge.js');
 const request = require('../schemas/request.js');
 const responsible = require('../schemas/responsible.js');
-const fetch = require('node-fetch');
-const requete = require("request");
 const axios = require("axios");
 const bcrypt =require('bcrypt');
 
@@ -318,20 +316,10 @@ router.get("/users",async (req,res)=>{
  * @returns {Error}  404 - Professors Not found
  */
 router.get("/professors",async (req,res)=>{
-    const url = "http://146.59.195.214:8006/api/v1/teachers/all";
-    /*axios.get(url)
+    axios.get('http://146.59.195.214:8006/api/v1/teachers/all')
         .then((response) => {
-            for (let prof of response.data) {
-                if (prof.email === req.params.email) {
-                    console.log(prof);
-                    res.status(200).json(prof)
-                }
-            }
-        })*/
-    requete.get(url, (error, response, body) => {
-        let json = JSON.parse(body);
-        res.status(200).json(json)
-    });
+            res.status(200).json(response.data)
+        })
 });
 
 /**
