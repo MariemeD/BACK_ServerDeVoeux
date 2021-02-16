@@ -108,22 +108,28 @@ const bcrypt =require('bcrypt');
  * @returns {Error}  400 - Bad request
  */
 router.post("/user",async (req,res)=>{
+    let isProfessorExist = null;
     const isUsernameExist = await user.findOne({ email: req.body.email });
+    // console.log("Username Exist " + isUsernameExist);
     const isResponsible = await responsible.findOne({ email: req.body.email });
-    const isProfessorExist = axios.get('http://146.59.195.214:8006/api/v1/teachers/all')
+    // console.log("Responsable Exist " + isResponsible);
+    axios.get('http://146.59.195.214:8006/api/v1/teachers/all')
         .then((response) => {
             for (let prof of response.data) {
                 if (prof.email === req.body.email) {
-                    res.status(200).json(prof)
+                    isProfessorExist = prof
                 }
             }
         })
-    console.log(isProfessorExist);
+    // console.log("Professeur Exist " + isProfessorExist);
     if ( isProfessorExist === null){
         return res.status(401).json({ error: "Vous n'êtes pas autorisé à vous inscrire. Contactez l'administrateur" });
     }
     else if(isUsernameExist) {
         return res.status(401).json({ error: "Utilisateur déjà existant" });
+    }
+    else{
+        return res.status(401).json({ error: "TOUT EST BON" });
     }
 });
 
@@ -403,16 +409,35 @@ router.get("/discharges",async (req,res)=>{
  */
 
 router.get("/courses",async (req,res)=>{
-    axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
-        .then((response) => {
-            res.status(200).json(response.data)
-        })
-    /*await course.find({}).then((result)=>{
+    await course.find({}).then((result)=>{
         res.status(200).json(result)
     },(err)=>{
         res.status(404).json(err)
-    })*/
+    })
 });
+
+/**
+ * Get all courses
+ * @route GET /courses
+ * @group course - Operations about course
+ * @returns {object} 200 - All Courses
+ * @returns {Error}  404 - Courses Not found
+ */
+router.get("/synchronizeCourse",async (req,res)=>{
+    axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
+        .then((response) => {
+            for (let matiere of response.data) {
+                // console.log(matiere);
+                const isAlreadyCreated = course.findOne({ name: matiere});
+                console.log(isAlreadyCreated)
+                if (isAlreadyCreated === null){
+                    console.log("N'existe pas")
+                }
+            }
+        })
+});
+
+
 
 /**
  * Get all request

@@ -6,7 +6,7 @@ const request  = mongoose.Schema({
     detailRequest : String,
     groupRequested : String,
     courseRequested : String,
-    response : Boolean
+    status : String
 })
 
 module.exports = mongoose.model('request', request);
