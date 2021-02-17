@@ -141,8 +141,10 @@ router.post("/user",async (req,res)=>{
 
 /**
  * LOGIN
- * @route POST /login
+ * @route GET /login
  * @group user - Operations about user
+ * @param {string} email.path.required - The email for login
+ * @param {string} password.path.required - The password for login
  * @returns {user.model} 201 - Success
  * @returns {Error}  400 -  Echec
  */
@@ -423,11 +425,11 @@ router.get("/courses",async (req,res)=>{
 });
 
 /**
- * Get all courses
+ * Synchronization
  * @route GET /synchronizeCourse
- * @group course - Operations about course
- * @returns {object} 200 - All Courses
- * @returns {Error}  404 - Courses Not found
+ * @group course - Operations about course - Synchronization with VT AGENDA
+ * @returns {object} 200 -
+ * @returns {Error}  404 -
  */
 router.get("/synchronizeCourse", (req,res)=>{
     axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
