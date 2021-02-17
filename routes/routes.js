@@ -140,23 +140,6 @@ router.post("/user",async (req,res)=>{
 });
 
 /**
- * LOGIN
- * @route GET /login
- * @group user - Operations about user
- * @param {string} email.path.required - The email for login
- * @param {string} password.path.required - The password for login
- * @returns {user.model} 201 - Success
- * @returns {Error}  400 -  Echec
- */
-router.get("/login/:email/:password", async (req, res) => {
-    const userLogin = await user.findOne({ email: req.params.email });
-    if (!userLogin) return res.status(401).json({ error: "Nom d'utilisateur incorrect" });
-    const validPassword = await bcrypt.compare(req.params.password, userLogin.password);
-    if (!validPassword) return res.status(401).json({ error: "Mot de passe incorrect" });
-    res.status(200).json({userLogin})
-});
-
-/**
  * Add a new professor
  * @route POST /professor
  * @group professor - Operations about professor
@@ -303,6 +286,23 @@ router.post("/responsible",async (req,res)=>{
 // ----------------------------
 // -----------[GET]------------
 // ----------------------------
+
+/**
+ * LOGIN
+ * @route GET /login/{email}/{password}
+ * @group user - Operations about user
+ * @param {string} email.path.required - The email for login
+ * @param {string} password.path.required - The password for login
+ * @returns {user.model} 201 - Success
+ * @returns {Error}  400 -  Echec
+ */
+router.get("/login/:email/:password", async (req, res) => {
+    const userLogin = await user.findOne({ email: req.params.email });
+    if (!userLogin) return res.status(401).json({ error: "Nom d'utilisateur incorrect" });
+    const validPassword = await bcrypt.compare(req.params.password, userLogin.password);
+    if (!validPassword) return res.status(401).json({ error: "Mot de passe incorrect" });
+    res.status(200).json({userLogin})
+});
 
 /**
  * Get all users
