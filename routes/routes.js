@@ -429,16 +429,25 @@ router.get("/courses",async (req,res)=>{
  * @returns {object} 200 - All Courses
  * @returns {Error}  404 - Courses Not found
  */
-router.get("/synchronizeCourse",async (req,res)=>{
+router.get("/synchronizeCourse", (req,res)=>{
     axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
         .then((matieres) => {
             for (let matiere of matieres.data) {
+                //console.log("matiere " + matiere)
                 axios.get("https://back-serverdevoeux.herokuapp.com/api/courses")
                     .then((cours) => {
                         for ( let crs of cours.data){
+                            //console.log("cours " + crs)
                             if (matiere === crs.name)
                             {
                                 console.log("Matiere " + matiere + " Cours " + crs.name + " OK")
+                                axios({
+                                    method: 'post',
+                                    url: 'https://back-serverdevoeux.herokuapp.com/api/course',
+                                    data: {
+                                        name: matiere,
+                                    }
+                                });
                             }
                             else {
                                 console.log("Matiere " + matiere + " Cours " + crs.name + " KO")
