@@ -440,7 +440,7 @@ router.get("/synchronizeCourse", (req,res)=>{
                             //console.log("cours " + crs)
                             if (matiere === crs.name)
                             {
-                                console.log("Matiere " + matiere + " Cours " + crs.name + " OK")
+                                console.log("Matiere " + matiere + " Cours " + crs.name + " Existe déjà")
                             }
                             else {
                                 axios({
@@ -448,6 +448,10 @@ router.get("/synchronizeCourse", (req,res)=>{
                                     url: 'https://back-serverdevoeux.herokuapp.com/api/course',
                                     data: {
                                         name: matiere,
+                                        type: "",
+                                        professor: "",
+                                        semester: "",
+                                        covered: ""
                                     }
                                 });
                             }
