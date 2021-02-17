@@ -441,6 +441,8 @@ router.get("/synchronizeCourse", (req,res)=>{
                             if (matiere === crs.name)
                             {
                                 console.log("Matiere " + matiere + " Cours " + crs.name + " OK")
+                            }
+                            else {
                                 axios({
                                     method: 'post',
                                     url: 'https://back-serverdevoeux.herokuapp.com/api/course',
@@ -448,9 +450,6 @@ router.get("/synchronizeCourse", (req,res)=>{
                                         name: matiere,
                                     }
                                 });
-                            }
-                            else {
-                                console.log("Matiere " + matiere + " Cours " + crs.name + " KO")
                             }
                         }
                     })
