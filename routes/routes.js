@@ -424,21 +424,27 @@ router.get("/courses",async (req,res)=>{
 
 /**
  * Get all courses
- * @route GET /courses
+ * @route GET /synchronizeCourse
  * @group course - Operations about course
  * @returns {object} 200 - All Courses
  * @returns {Error}  404 - Courses Not found
  */
 router.get("/synchronizeCourse",async (req,res)=>{
     axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
-        .then((response) => {
-            for (let matiere of response.data) {
-                // console.log(matiere);
-                const isAlreadyCreated = course.findOne({ name: matiere});
-                console.log(isAlreadyCreated)
-                if (isAlreadyCreated === null){
-                    console.log("N'existe pas")
-                }
+        .then((matieres) => {
+            for (let matiere of matieres.data) {
+                axios.get("https://back-serverdevoeux.herokuapp.com/api/courses")
+                    .then((cours) => {
+                        for ( let crs of cours.data){
+                            if (matiere === crs.name)
+                            {
+                                console.log("Matiere " + matiere + " Cours " + crs.name + " OK")
+                            }
+                            else {
+                                console.log("Matiere " + matiere + " Cours " + crs.name + " KO")
+                            }
+                        }
+                    })
             }
         })
 });
