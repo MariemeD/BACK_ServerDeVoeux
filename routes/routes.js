@@ -433,69 +433,34 @@ router.get("/courses",async (req,res)=>{
  * @returns {object} 200 -
  * @returns {Error}  404 -
  */
-/*router.get("/synchronizeCourse", (req,res)=>{
-     axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
-        .then((matieres) => {
-            for (let matiere of matieres.data) {
-                //console.log("matiere " + matiere)
-                try {
-                    axios.get('https://back-serverdevoeux.herokuapp.com/api/courses')
-                        .then((cours) => {
-                            for (let crs of cours.data) {
-                                try {
-                                    if (matiere === crs.name) {
-                                        console.log("Matiere " + matiere + " Cours " + crs.name + " Existe déjà")
-                                    } else {
-                                        try {
-                                            console.log("Matiere " + matiere + " Cours " + crs.name + " Existe pas")
-                                            const options = {
-                                                hostname: 'back-serverdevoeux.herokuapp.com',
-                                                port: 443,
-                                                path: '/api/course',
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'Content-Length': matiere.length
-                                                }
-                                            }
-                                            const req = https.request(options, res => {
-                                                console.log(`statusCode: ${res.statusCode}`)
-
-                                                res.on('data', d => {
-                                                    process.stdout.write(d)
-                                                })
-                                            })
-
-                                            req.on('error', error => {
-                                                console.error(error)
-                                            })
-
-                                            req.write(matiere)
-                                            req.end()
-
-                                        } catch (error) {
-                                            console.error(error)
-                                            process.exit(1)
-                                        }
-                                    }
-                                } catch (error) {
-                                    console.error(error)
-                                    process.exit(1)
-                                }
-                            }
-                        })
-                }catch (error) {
-                    console.error(error)
-                    process.exit(1)
-                }
-            }
-        })
-});*/
-
-router.get("/synchronizeCourse", (req,res)=>{
+router.get("/synchronizeCourse",(req,res)=>{
     axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
         .then((matieres) => {
-
+            for (let matiere of matieres.data){
+                course.findOne({name: matiere}, function(err,obj)
+                {
+                    // console.log(obj);
+                    if (obj === null){
+                        console.log("Cours inexistant " + matiere)
+                        let newCourse = new course(
+                            {
+                                name: matiere,
+                                type: "",
+                                professor: "",
+                                semester: "",
+                                covered: false
+                            });
+                        newCourse.save().then((result)=>{
+                            console.log("Cours créé")
+                        },(err)=>{
+                            console.log("Erreur creation")
+                        })
+                    }
+                    else{
+                        console.log("Cours existant " + obj.name)
+                    }
+                });
+            }
         })
 })
 
