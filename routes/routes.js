@@ -16,6 +16,8 @@ const request = require('../schemas/request.js');
 const responsible = require('../schemas/responsible.js');
 const axios = require("axios");
 const bcrypt =require('bcrypt');
+const https = require('https')
+
 
 // ----------------------------
 // ----------[SCHEMAS]---------
@@ -431,39 +433,71 @@ router.get("/courses",async (req,res)=>{
  * @returns {object} 200 -
  * @returns {Error}  404 -
  */
-router.get("/synchronizeCourse", (req,res)=>{
-    axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
+/*router.get("/synchronizeCourse", (req,res)=>{
+     axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
         .then((matieres) => {
             for (let matiere of matieres.data) {
                 //console.log("matiere " + matiere)
-                axios.get("https://back-serverdevoeux.herokuapp.com/api/courses")
-                    .then((cours) => {
-                        for ( let crs of cours.data){
-                            //console.log("cours " + crs)
-                            if (matiere === crs.name)
-                            {
-                                console.log("Matiere " + matiere + " Cours " + crs.name + " Existe déjà")
-                            }
-                            else {
-                                axios({
-                                    method: 'post',
-                                    url: 'https://back-serverdevoeux.herokuapp.com/api/course',
-                                    data: {
-                                        name: matiere,
-                                        type: "",
-                                        professor: "",
-                                        semester: "",
-                                        covered: ""
+                try {
+                    axios.get('https://back-serverdevoeux.herokuapp.com/api/courses')
+                        .then((cours) => {
+                            for (let crs of cours.data) {
+                                try {
+                                    if (matiere === crs.name) {
+                                        console.log("Matiere " + matiere + " Cours " + crs.name + " Existe déjà")
+                                    } else {
+                                        try {
+                                            console.log("Matiere " + matiere + " Cours " + crs.name + " Existe pas")
+                                            const options = {
+                                                hostname: 'back-serverdevoeux.herokuapp.com',
+                                                port: 443,
+                                                path: '/api/course',
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'Content-Length': matiere.length
+                                                }
+                                            }
+                                            const req = https.request(options, res => {
+                                                console.log(`statusCode: ${res.statusCode}`)
+
+                                                res.on('data', d => {
+                                                    process.stdout.write(d)
+                                                })
+                                            })
+
+                                            req.on('error', error => {
+                                                console.error(error)
+                                            })
+
+                                            req.write(matiere)
+                                            req.end()
+
+                                        } catch (error) {
+                                            console.error(error)
+                                            process.exit(1)
+                                        }
                                     }
-                                });
+                                } catch (error) {
+                                    console.error(error)
+                                    process.exit(1)
+                                }
                             }
-                        }
-                    })
+                        })
+                }catch (error) {
+                    console.error(error)
+                    process.exit(1)
+                }
             }
         })
-});
+});*/
 
+router.get("/synchronizeCourse", (req,res)=>{
+    axios.get('http://146.59.195.214:8006/api/v1/events/matieres')
+        .then((matieres) => {
 
+        })
+})
 
 /**
  * Get all request
@@ -509,6 +543,19 @@ router.route('/course/:idCourse').get(function async(req,res){
             res.status(404).json(err);
         res.status(200).json(course);
     });
+});
+
+/**
+ * Get a Course by name
+ * @route GET /course/{courseName}
+ * @group course - Operations about course
+ * @param {string} courseName.path.required - The name of the course we are looking for
+ * @returns {object} 200 - A course
+ * @returns {Error}  404 - Course Not found
+ */
+router.route('/courseByName/:courseName').get(async function (req,res){
+    const coursExisted = await course.findOne({name: req.params.courseName}, function(err,obj) { console.log(obj); });
+    res.status(200).json(coursExisted);
 });
 
 /**
