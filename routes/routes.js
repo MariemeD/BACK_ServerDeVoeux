@@ -33,14 +33,10 @@ const https = require('https')
  * @property {string} lastname
  * @property {string} firstname
  * @property {string} email
- * @property {boolean} isSupervisor
- * @property {boolean} isAdmin
  * @property {string} status
- * @property {string} origin
- * @property {number} hoursDone
- * @property {date} lastConnection
- * @property {date} lastWishUpdate
- * @property {array} modules
+ * @property {string} service
+ * @property {date} department
+ * @property {array} composante
  */
 
 /**
@@ -116,28 +112,32 @@ const https = require('https')
  * @returns {Error}  400 - Bad request
  */
 router.post("/user",async (req,res)=>{
-    let isProfessorExist
     const isUsernameExist = await user.findOne({ email: req.body.email });
-    // console.log("Username Exist " + isUsernameExist);
     const isResponsible = await responsible.findOne({ email: req.body.email });
-    // console.log("Responsable Exist " + isResponsible);
-    axios.get('http://146.59.195.214:8006/api/v1/teachers/all')
-        .then((response) => {
-            for (let prof of response.data) {
-                if (prof.email === req.body.email) {
-                    isProfessorExist = prof
-                }
-            }
-        })
-    // console.log("Professeur Exist " + isProfessorExist);
-    if ( isProfessorExist === null){
+    const isProfessorExist = await professor.findOne({ email: req.body.email });
+    if (!isProfessorExist){
         return res.status(401).json({ error: "Vous n'êtes pas autorisé à vous inscrire. Contactez l'administrateur" });
     }
     else if(isUsernameExist) {
         return res.status(401).json({ error: "Utilisateur déjà existant" });
     }
     else{
-        return res.status(401).json({ error: "TOUT EST BON" });
+        const salt = await bcrypt.genSalt(10);
+        const password = await bcrypt.hash(req.body.password, salt);
+        let newUser = new user(req.body);
+        newUser.password = password;
+        if(isResponsible){
+            newUser.profile = "responsable"
+            newUser.group = isResponsible.group
+        }
+        else{
+            newUser.profile = "professeur"
+        }
+        await newUser.save().then((result)=>{
+            res.status(201).json({ NewUser : "201 => https://back-serverdevoeux.herokuapp.com/api/professors/"+newUser._id})
+        },(err)=>{
+            res.status(401).json(err)
+        })
     }
 });
 
@@ -329,10 +329,15 @@ router.get("/users",async (req,res)=>{
  * @returns {Error}  404 - Professors Not found
  */
 router.get("/professors",async (req,res)=>{
-    axios.get('http://146.59.195.214:8006/api/v1/teachers/all')
+    /*axios.get('http://146.59.195.214:8006/api/v1/teachers/all')
         .then((response) => {
             res.status(200).json(response.data)
-        })
+        })*/
+    await professor.find({}).then((result)=>{
+        res.status(200).json(result)
+    },(err)=>{
+        res.status(404).json(err)
+    })
 });
 
 /**
@@ -427,7 +432,7 @@ router.get("/courses",async (req,res)=>{
 });
 
 /**
- * Synchronization
+ * Synchronization cours
  * @route GET /synchronizeCourse
  * @group course - Operations about course - Synchronization with VT AGENDA
  * @returns {object} 200 -
@@ -458,6 +463,46 @@ router.get("/synchronizeCourse",(req,res)=>{
                     }
                     else{
                         console.log("Cours existant " + obj.name)
+                    }
+                });
+            }
+        })
+})
+
+/**
+ * Synchronization professeur
+ * @route GET /synchronizeProfessor
+ * @group professor - Operations about professor - Synchronization with VT AGENDA
+ * @returns {object} 200 -
+ * @returns {Error}  404 -
+ */
+router.get("/synchronizeProfessor",(req,res)=>{
+    axios.get('http://146.59.195.214:8006/api/v1/teachers/all')
+        .then((professors) => {
+            for (let prof of professors.data){
+                professor.findOne({email: prof.email}, function(err,obj)
+                {
+                    if (obj === null){
+                        console.log("Professeur inexistant " + prof)
+                        console.log(prof.email);
+                        let newProfessor = new professor(
+                            {
+                                lastName: prof.lastname,
+                                firstName: prof.firstName,
+                                email: prof.email,
+                                status: prof.status,
+                                service: prof.service,
+                                department: prof.department,
+                                composante: prof.composante
+                            });
+                        newProfessor.save().then((result)=>{
+                            console.log("Professeur créé")
+                        },(err)=>{
+                            console.log("Erreur creation")
+                        })
+                    }
+                    else{
+                        console.log("Professeur existant " + obj.email)
                     }
                 });
             }
