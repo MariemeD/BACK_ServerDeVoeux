@@ -116,7 +116,7 @@ router.post("/user",async (req,res)=>{
     const isResponsible = await responsible.findOne({ email: req.body.email });
     const isProfessorExist = await professor.findOne({ email: req.body.email });
     if (!isProfessorExist){
-        return res.status(401).json({ error: "Vous n'êtes pas autorisé à vous inscrire. Contactez l'administrateur" });
+        return res.status(403).json({ error: "Vous n'êtes pas autorisé à vous inscrire. Contactez l'administrateur" });
     }
     else if(isUsernameExist) {
         return res.status(401).json({ error: "Utilisateur déjà existant" });
@@ -136,7 +136,7 @@ router.post("/user",async (req,res)=>{
         await newUser.save().then((result)=>{
             res.status(201).json({ NewUser : "201 => https://back-serverdevoeux.herokuapp.com/api/professors/"+newUser._id})
         },(err)=>{
-            res.status(401).json(err)
+            res.status(500).json(err)
         })
     }
 });
