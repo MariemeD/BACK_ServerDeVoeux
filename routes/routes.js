@@ -453,7 +453,11 @@ router.get("/synchronizeCourse",(req,res)=>{
                                 type: "",
                                 professor: "",
                                 semester: "",
-                                covered: false
+                                covered: false,
+                                hoursPerGroup: 0,
+                                nbrOfGroup: 0,
+                                group: "",
+                                hoursDone: 0,
                             });
                         newCourse.save().then((result)=>{
                             console.log("Cours créé")
