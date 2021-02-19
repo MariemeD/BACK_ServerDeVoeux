@@ -134,7 +134,7 @@ router.post("/user",async (req,res)=>{
             newUser.profile = "professeur"
         }
         await newUser.save().then((result)=>{
-            res.status(201).json({ NewUser : "201 => https://back-serverdevoeux.herokuapp.com/api/professors/"+newUser._id})
+            res.status(201).json({ error : "201 => https://back-serverdevoeux.herokuapp.com/api/professors/"+newUser._id})
         },(err)=>{
             res.status(500).json(err)
         })
@@ -491,7 +491,7 @@ router.get("/synchronizeProfessor",(req,res)=>{
                         console.log(prof.email);
                         let newProfessor = new professor(
                             {
-                                lastName: prof.lastname,
+                                lastName: prof.lastName,
                                 firstName: prof.firstName,
                                 email: prof.email,
                                 status: prof.status,
