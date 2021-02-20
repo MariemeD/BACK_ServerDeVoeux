@@ -432,6 +432,25 @@ router.get("/courses",async (req,res)=>{
 });
 
 /**
+ * Get all professors for a course
+ * @route GET /professorCourse
+ * @group professor - Operations about professor
+ * @returns {object} 200 - All Professors
+ * @returns {Error}  404 - Professors Not found
+ */
+router.get("/professors",async (req,res)=>{
+    /*axios.get('http://146.59.195.214:8006/api/v1/teachers/all')
+        .then((response) => {
+            res.status(200).json(response.data)
+        })*/
+    await professor.find({}).then((result)=>{
+        res.status(200).json(result)
+    },(err)=>{
+        res.status(404).json(err)
+    })
+});
+
+/**
  * Synchronization cours
  * @route GET /synchronizeCourse
  * @group course - Operations about course - Synchronization with VT AGENDA
@@ -446,27 +465,34 @@ router.get("/synchronizeCourse",(req,res)=>{
                 {
                     // console.log(obj);
                     if (obj === null){
-                        console.log("Cours inexistant " + matiere)
-                        let newCourse = new course(
-                            {
-                                name: matiere,
-                                type: "",
-                                professor: "",
-                                semester: "",
-                                covered: false,
-                                hoursPerGroup: 0,
-                                nbrOfGroup: 0,
-                                group: "",
-                                hoursDone: 0,
-                            });
-                        newCourse.save().then((result)=>{
-                            console.log("Cours créé")
-                        },(err)=>{
-                            console.log("Erreur creation")
-                        })
+                        //console.log("Cours inexistant " + matiere)
+                        axios.get('http://146.59.195.214:8006/api/v1/events/teacher/' + matiere
+                        )
+                            .then(function (profs) {
+                                //console.log(profs.data)
+                                console.log(profs)
+                                let newCourse = new course(
+                                    {
+                                        name: matiere,
+                                        type: "",
+                                        professor : profs.data,
+                                        semester: "",
+                                        covered: false,
+                                        hoursPerGroup: 0,
+                                        nbrOfGroup: 0,
+                                        group: "",
+                                        hoursDone: 0,
+                                    });
+                                console.log(newCourse)
+                                newCourse.save().then((result)=>{
+                                    console.log("Cours créé")
+                                },(err)=>{
+                                    //console.log("Erreur creation")
+                                })
+                            })
                     }
                     else{
-                        console.log("Cours existant " + obj.name)
+                        //console.log("Cours existant " + obj.name)
                     }
                 });
             }
@@ -705,15 +731,15 @@ router.route('/request/:idRequest').get(function async(req,res){
 });
 
 /**
- * Get a Responsible by id
- * @route GET /responsible/{idResponsible}
+ * Get a Responsible by email
+ * @route GET /responsible/{emailResponsible}
  * @group responsible - Operations about Responsible
- * @param {string} idResponsible.path.required - The id of the responsible we are looking for
+ * @param {string} emailResponsible.path.required - The email of the responsible we are looking for
  * @returns {object} 200 - A responsible
  * @returns {Error}  404 - Responsible Not found
  */
-router.route('/responsible/:idResponsible').get(function async(req,res){
-    responsible.findById(req.params.idResponsible, function(err, responsible) {
+router.route('/responsible/:emailResponsible').get(function async(req,res){
+    responsible.findOne(req.params.emailResponsible, function(err, responsible) {
         if (err)
             res.status(404).json(responsible);
         res.status(200).json(responsible);
