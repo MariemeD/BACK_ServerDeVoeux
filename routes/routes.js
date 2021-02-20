@@ -738,12 +738,9 @@ router.route('/request/:idRequest').get(function async(req,res){
  * @returns {object} 200 - A responsible
  * @returns {Error}  404 - Responsible Not found
  */
-router.route('/responsible/:emailResponsible').get(function async(req,res){
-    responsible.findOne(req.params.emailResponsible, function(err, responsible) {
-        if (err)
-            res.status(404).json(responsible);
-        res.status(200).json(responsible);
-    });
+router.route('/responsible/:emailResponsible').get(async function async(req,res){
+    const resp = await responsible.findOne({email: req.params.emailResponsible}, function(err,obj) { console.log(obj); });
+    res.status(200).json(resp);
 });
 
 // ----------------------------
