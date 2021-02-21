@@ -761,8 +761,8 @@ router.put('/user/:userEmail', async function(req, res) {
     user.findOneAndUpdate({email: req.params.userEmail}, {$set:{password:password}},function(err, doc){
         if(err){
             res.status(204).json({ Result : "204 - Password not changed"})
-        }
-        res.status(200).json({ Result : "200 - Password changed"})
+        }else
+            res.status(200).json({ Result : "200 - Password changed"})
     });
 
 });
