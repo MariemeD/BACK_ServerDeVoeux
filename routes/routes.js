@@ -739,17 +739,8 @@ router.route('/request/:idRequest').get(function async(req,res){
  * @returns {Error}  404 - Responsible Not found
  */
 router.route('/responsible/:emailResponsible').get(async function async(req,res){
-    const resp = await responsible.findOne({email: req.params.emailResponsible}, function(err,obj)
-    {
-        console.log(obj);
-        if (!err) {
-            console.log("step2"); // That's very very weird,that's work but RARELY that's doesn't work
-            res.status(200).json(resp)
-        }
-        else {
-            console.log(err.message);
-        }
-    });
+    const resp = await responsible.findOne({email: req.params.emailResponsible}, function(err,obj) { console.log(obj); });
+    res.status(200).json(resp);
 });
 
 // ----------------------------
