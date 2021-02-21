@@ -755,17 +755,16 @@ router.route('/responsible/:emailResponsible').get(async function async(req,res)
  * @returns {object} 200 - user updated
  * @returns {Error}  default - Unexpected error
  */
-router.put('/user/:idUser', async function(req, res) {
+router.put('/user/:userEmail', async function(req, res) {
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(req.body.password, salt);
-    user.findByIdAndUpdate(req.params.idUser,
-        {password: password}, function(err, data) {
-            if (err) {
-                res.status(204).json({ Result : "204 - Password not changed"})
-            } else {
-                res.status(200).json({ Result : "200 - Password changed"})
-            }
-        });
+    user.findOneAndUpdate({email: req.params.userEmail}, {$set:{password:password}},function(err, doc){
+        if(err){
+            res.status(204).json({ Result : "204 - Password not changed"})
+        }
+        res.status(200).json({ Result : "200 - Password changed"})
+    });
+
 });
 
 /**
