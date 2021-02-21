@@ -16,7 +16,17 @@ const request = require('../schemas/request.js');
 const responsible = require('../schemas/responsible.js');
 const axios = require("axios");
 const bcrypt =require('bcrypt');
-const https = require('https')
+var nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    port: 465,               // true for 465, false for other ports
+    host: "smtp.gmail.com",
+    auth: {
+        user: 'sdvdonotreply@gmail.com',
+        pass: 'serveurdevoeux',
+    },
+    secure: true,
+});
 
 
 // ----------------------------
@@ -103,6 +113,22 @@ const https = require('https')
 // ----------------------------
 // -----------[POST]-----------
 // ----------------------------
+
+router.post('/sendEmail', (req, res) => {
+    const {to , subject, text} = req.body;
+    const mailData = {
+        from: 'sdvdonotreply@gmail.com',
+        to: to,
+        subject: subject,
+        text: text
+    }
+    transporter.sendMail(mailData, (error,info) =>{
+        if(error){
+            return console.log(error)
+        }
+        res.status(200).send({ message : "Mail envoyé", message_id: info.messageId})
+    })
+})
 
 /**
  * Add a new user
