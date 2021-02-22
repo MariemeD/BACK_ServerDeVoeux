@@ -769,6 +769,21 @@ router.route('/responsible/:emailResponsible').get(async function async(req,res)
     res.status(200).json(resp);
 });
 
+/**
+ * Get responsible by group name
+ * @route GET /responsible/{groupName}/responsibles
+ * @group responsible - Operations about Responsible
+ * @param {string} groupName.path.required - The groupName of the responsible we are looking for
+ * @returns {object} 200 - A responsible
+ * @returns {Error}  404 - Responsible Not found
+ */
+router.route('/responsible/:groupName/responsibles').get(async function async(req,res){
+    const resp = await responsible.find({group: req.params.groupName}, function(err,obj) { console.log(obj); });
+    res.status(200).json(resp);
+});
+
+
+
 // ----------------------------
 // ---------[UPDATE]-----------
 // ----------------------------
