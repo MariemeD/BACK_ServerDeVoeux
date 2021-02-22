@@ -18,7 +18,8 @@ const passwordReset = require('../schemas/responsible.js');
 const serveur = require('../schemas/serveur.js');
 const axios = require("axios");
 const bcrypt =require('bcrypt');
-var nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
+const generator = require('generate-password');
 
 const transporter = nodemailer.createTransport({
     port: 465,               // true for 465, false for other ports
@@ -185,18 +186,39 @@ router.post('/reset', async (req, res) => {
         res.status(404).json({ error : "404 - Utilisateur inexistant"})
     }
     else{
+        let password = generator.generate({
+            length: 10,
+            numbers: true
+        });
         let emailResetPassword = {
             to : req.body.email,
             subject : "Serveur de voeux - Nouveau mot de passe",
-            text : "Voici votre nouveau mot de passe"
+            text : "Voici votre nouveau mot de passe : " + password + ". Merci de le changer dès que possible."
         }
         await axios.post('https://back-serverdevoeux.herokuapp.com/api/sendEmail', emailResetPassword)
             .then(
                 response =>{
                     console.log(response)
-                }
+                    axios.put("https://back-serverdevoeux.herokuapp.com/api/user/"+req.body.email+"/password",
+                        {
+                            password: password
+                        }).then(
+                        response => {
+                            // console.log(response)
+                            res.status(200).send({ message : "Mot de passe modifié"})
+                            console.log("Changement mot de passe")
+                        }
+                    ).catch(error => {
+                        // console.log(error)
+                        res.status(204).send({ message : "Mot de passe non modifié"})
+                        console.log("Changement mot de passe erreur")
+                    })
 
-        )
+                }).catch(error => {
+                    // console.log(error)
+                    res.status(500).send({ message : "Email non envoyé"})
+                    console.log("Envoi email erreur")
+            })
     }
 })
 
