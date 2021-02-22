@@ -947,7 +947,7 @@ router.put('/user/:userEmail/password', async function(req, res) {
  * @returns {Error}  default - Unexpected error
  */
 router.put('/user/:userEmail/profile', async function(req, res) {
-        user.findOneAndUpdate({email: req.params.userEmail}, {$set:{profile:req.body.profil}},function(err, doc){
+        user.findOneAndUpdate({email: req.params.userEmail}, {$set:{profile:req.body.profile}},function(err, doc){
             if(err){
                 res.status(204).json({ Result : "204 - Password not changed"})
             }else
