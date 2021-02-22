@@ -152,7 +152,7 @@ router.get("/server",async (req,res)=>{
  * Update server
  * @route PUT /server/{statusServer}
  * @group server - Operations about server
- * @param {string} status.path.required - The status of the server
+ * @param {string} statusServer.path.required - The status of the server
  * @returns {object} 200 - Status changed
  * @returns {Error}  default - Unexpected error
  */
@@ -183,6 +183,19 @@ router.post('/reset', async (req, res) => {
     const utilisateur = await user.findOne({ email: req.body.email});
     if (!utilisateur){
         res.status(404).json({ error : "404 - Utilisateur inexistant"})
+    }
+    else{
+        let emailResetPassword = {
+            to : req.body.email,
+            subject : "Serveur de voeux - Nouveau mot de passe"
+        }
+        await axios.post('https://back-serverdevoeux.herokuapp.com/api/sendEmail', emailResetPassword)
+            .then(
+                response =>{
+                    console.log(response)
+                }
+
+        )
     }
 })
 
@@ -415,11 +428,15 @@ router.get("/login/:email/:password", async (req, res) => {
             return res.status(401).json({ error: "Nom d'utilisateur ou mot de passe incorrect" });
         } else{
             const srv = await serveur.findOne({ id: idServeur });
-            if (!srv.status && userLogin.profile === "admin")
+            console.log(srv.status)
+            console.log(userLogin.profile)
+            if (srv.status === false && userLogin.profile === "admin")
             {
                 return res.status(200).json({ error: "TOUT EST OK" });
-            }else {
+            }else if (srv.status === false && userLogin.profile !== "admin"){
                 return res.status(403).json({ error: "Le serveur de voeux est actuellement fermé" });
+            }else {
+                return res.status(200).json({ error: "TOUT EST OK" });
             }
         }
     }
