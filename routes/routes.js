@@ -187,7 +187,8 @@ router.post('/reset', async (req, res) => {
     else{
         let emailResetPassword = {
             to : req.body.email,
-            subject : "Serveur de voeux - Nouveau mot de passe"
+            subject : "Serveur de voeux - Nouveau mot de passe",
+            text : "Voici votre nouveau mot de passe"
         }
         await axios.post('https://back-serverdevoeux.herokuapp.com/api/sendEmail', emailResetPassword)
             .then(
@@ -436,7 +437,7 @@ router.get("/login/:email/:password", async (req, res) => {
             }else if (srv.status === false && userLogin.profile !== "admin"){
                 return res.status(403).json({ error: "Le serveur de voeux est actuellement fermé" });
             }else {
-                return res.status(200).json({ error: "TOUT EST OK" });
+                return res.status(200).json({userLogin});
             }
         }
     }
@@ -465,10 +466,6 @@ router.get("/users",async (req,res)=>{
  * @returns {Error}  404 - Professors Not found
  */
 router.get("/professors",async (req,res)=>{
-    /*axios.get('http://146.59.195.214:8006/api/v1/teachers/all')
-        .then((response) => {
-            res.status(200).json(response.data)
-        })*/
     await professor.find({}).then((result)=>{
         res.status(200).json(result)
     },(err)=>{
