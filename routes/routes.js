@@ -904,7 +904,7 @@ router.put('/user/:userEmail/password', async function(req, res) {
 
 /**
  * Update user profile
- * @route PUT /user/{userEmail}/{profile}
+ * @route PUT /user/{userEmail}/profile
  * @group user - Operations about user
  * @param {string} userProfile.path.required - profile
  * @returns {object} 200 - user updated
