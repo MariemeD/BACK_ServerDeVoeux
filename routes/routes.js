@@ -14,6 +14,8 @@ const course = require('../schemas/course.js');
 const discharge = require('../schemas/discharge.js');
 const request = require('../schemas/request.js');
 const responsible = require('../schemas/responsible.js');
+const passwordReset = require('../schemas/responsible.js');
+const serveur = require('../schemas/serveur.js');
 const axios = require("axios");
 const bcrypt =require('bcrypt');
 var nodemailer = require('nodemailer');
@@ -116,6 +118,53 @@ const transporter = nodemailer.createTransport({
  * @property {string} subject
  * @property {string} text
  */
+
+// ----------------------------
+// -----------[SERVER]---------
+// ----------------------------
+
+router.post("/serveur",async (req,res)=>{
+    let serveurDeVoeux = new serveur(req.body);
+    await serveurDeVoeux.save().then((result)=>{
+        res.status(201).json({ NewServeur : "201 => " + serveurDeVoeux._id})
+    },(err)=>{
+        res.status(400).json(err)
+    })
+});
+
+/**
+ * Get serveur infos
+ * @route GET /server
+ * @group server - Operations about server
+ * @returns {object} 200 - Serveur info
+ * @returns {Error}  404 - Error
+ */
+router.get("/server",async (req,res)=>{
+    await serveur.find({}).then((result)=>{
+        res.status(200).json(result)
+    },(err)=>{
+        res.status(404).json(err)
+    })
+});
+
+/**
+ * Update server
+ * @route PUT /server/{statusServer}
+ * @group server - Operations about server
+ * @param {string} status.path.required - The id of the responsible you want to update
+ * @returns {object} 200 - Status changed
+ * @returns {Error}  default - Unexpected error
+ */
+router.put('/server/:statusServer', async (req, res) => {
+    serveur.findOneAndUpdate({id: "SDV"}, {$set:{status: req.params.statusServer}},function(err, doc){
+        if(err){
+            res.status(204).json({ Result : "500 -  Error"})
+        }else
+            res.status(200).json({ Result : "200 - Status changed"})
+    });
+});
+
+
 
 // ----------------------------
 // -----------[POST]-----------
@@ -339,11 +388,25 @@ router.post("/responsible",async (req,res)=>{
  * @returns {Error}  400 -  Echec
  */
 router.get("/login/:email/:password", async (req, res) => {
+    let idServeur = "SDV"
     const userLogin = await user.findOne({ email: req.params.email });
-    if (!userLogin) return res.status(401).json({ error: "Nom d'utilisateur incorrect" });
-    const validPassword = await bcrypt.compare(req.params.password, userLogin.password);
-    if (!validPassword) return res.status(401).json({ error: "Mot de passe incorrect" });
-    res.status(200).json({userLogin})
+    if (!userLogin)
+    {
+        return res.status(401).json({ error: "Nom d'utilisateur ou mot de passe incorrect" });
+    }else{
+        const validPassword = await bcrypt.compare(req.params.password, userLogin.password);
+        if (!validPassword){
+            return res.status(401).json({ error: "Nom d'utilisateur ou mot de passe incorrect" });
+        } else{
+            const srv = await serveur.findOne({ id: idServeur });
+            if (!srv.status && userLogin.profile === "admin")
+            {
+                return res.status(200).json({ error: "TOUT EST OK" });
+            }else {
+                return res.status(403).json({ error: "Le serveur de voeux est actuellement fermé" });
+            }
+        }
+    }
 });
 
 /**
@@ -801,7 +864,12 @@ router.route('/responsible/:groupName/responsibles').get(async function async(re
 // ----------------------------
 // ---------[UPDATE]-----------
 // ----------------------------
-
+router.post('/reset', async (req, res) => {
+    const utilisateur = await user.findOne({ email: req.params.userEmail});
+    if (!utilisateur){
+        res.status(404).json({ message : "404 - Utilisateur inexistant"})
+    }
+})
 /**
  * Update user password
  * @route PUT /user/{idUser}
