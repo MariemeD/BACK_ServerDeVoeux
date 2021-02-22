@@ -123,6 +123,7 @@ const transporter = nodemailer.createTransport({
 // -----------[SERVER]---------
 // ----------------------------
 
+
 router.post("/serveur",async (req,res)=>{
     let serveurDeVoeux = new serveur(req.body);
     await serveurDeVoeux.save().then((result)=>{
@@ -151,7 +152,7 @@ router.get("/server",async (req,res)=>{
  * Update server
  * @route PUT /server/{statusServer}
  * @group server - Operations about server
- * @param {string} status.path.required - The id of the responsible you want to update
+ * @param {string} status.path.required - The status of the server
  * @returns {object} 200 - Status changed
  * @returns {Error}  default - Unexpected error
  */
@@ -169,6 +170,21 @@ router.put('/server/:statusServer', async (req, res) => {
 // ----------------------------
 // -----------[POST]-----------
 // ----------------------------
+
+/**
+ * Reset email
+ * @route POST /reset
+ * @group user - Operations about user
+ * @param {string} status.path.required - The status of the server
+ * @returns {email.model} 201 - Email sent
+ * @returns {Error}  Default - Bad request
+ */
+router.post('/reset', async (req, res) => {
+    const utilisateur = await user.findOne({ email: req.params.userEmail});
+    if (!utilisateur){
+        res.status(404).json({ message : "404 - Utilisateur inexistant"})
+    }
+})
 
 /**
  * Send Email
@@ -864,21 +880,16 @@ router.route('/responsible/:groupName/responsibles').get(async function async(re
 // ----------------------------
 // ---------[UPDATE]-----------
 // ----------------------------
-router.post('/reset', async (req, res) => {
-    const utilisateur = await user.findOne({ email: req.params.userEmail});
-    if (!utilisateur){
-        res.status(404).json({ message : "404 - Utilisateur inexistant"})
-    }
-})
+
 /**
  * Update user password
- * @route PUT /user/{idUser}
+ * @route PUT /user/{userEmail}/password
  * @group user - Operations about user
- * @param {string} idUser.path.required - email
+ * @param {string} userEmail.path.required - email
  * @returns {object} 200 - user updated
  * @returns {Error}  default - Unexpected error
  */
-router.put('/user/:userEmail', async function(req, res) {
+router.put('/user/:userEmail/password', async function(req, res) {
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(req.body.password, salt);
     const utilisateur = await user.findOne({ email: req.params.userEmail});
@@ -894,6 +905,24 @@ router.put('/user/:userEmail', async function(req, res) {
         });
     }
 });
+
+/**
+ * Update user profile
+ * @route PUT /user/{userEmail}/{profile}
+ * @group user - Operations about user
+ * @param {string} userProfile.path.required - profile
+ * @returns {object} 200 - user updated
+ * @returns {Error}  default - Unexpected error
+ */
+router.put('/user/:userEmail/:profileUser', async function(req, res) {
+        user.findOneAndUpdate({email: req.params.userEmail}, {$set:{profile:req.params.profileUser}},function(err, doc){
+            if(err){
+                res.status(204).json({ Result : "204 - Password not changed"})
+            }else
+                res.status(200).json({ Result : "200 - Password changed"})
+        });
+});
+
 
 /**
  * Update a professor
