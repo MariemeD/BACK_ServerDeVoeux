@@ -114,6 +114,13 @@ const transporter = nodemailer.createTransport({
 // -----------[POST]-----------
 // ----------------------------
 
+/**
+ * Send Email
+ * @route POST /sendEmail
+ * @group user - Operations about user
+ * @returns {user.model} 201 - Email sent
+ * @returns {Error}  Default - Bad request
+ */
 router.post('/sendEmail', (req, res) => {
     const {to , subject, text} = req.body;
     const mailData = {
