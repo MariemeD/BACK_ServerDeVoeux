@@ -453,9 +453,8 @@ router.get("/login/:email/:password", async (req, res) => {
             const srv = await serveur.findOne({ id: idServeur });
             console.log(srv.status)
             console.log(userLogin.profile)
-            if (srv.status === false && userLogin.profile === "admin")
-            {
-                return res.status(200).json({ error: "TOUT EST OK" });
+            if (srv.status === false && userLogin.profile === "admin") {
+                return res.status(200).json({ userLogin });
             }else if (srv.status === false && userLogin.profile !== "admin"){
                 return res.status(403).json({ error: "Le serveur de voeux est actuellement fermé" });
             }else {
