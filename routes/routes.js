@@ -175,14 +175,14 @@ router.put('/server/:statusServer', async (req, res) => {
  * Reset email
  * @route POST /reset
  * @group user - Operations about user
- * @param {string} status.path.required - The status of the server
- * @returns {email.model} 201 - Email sent
+ * @param {string} userEmail.path.required - The status of the server
+ * @returns {user.model} 201 - Email sent
  * @returns {Error}  Default - Bad request
  */
 router.post('/reset', async (req, res) => {
-    const utilisateur = await user.findOne({ email: req.params.userEmail});
+    const utilisateur = await user.findOne({ email: req.body.email});
     if (!utilisateur){
-        res.status(404).json({ message : "404 - Utilisateur inexistant"})
+        res.status(404).json({ error : "404 - Utilisateur inexistant"})
     }
 })
 
@@ -558,10 +558,6 @@ router.get("/courses",async (req,res)=>{
  * @returns {Error}  404 - Professors Not found
  */
 router.get("/professors",async (req,res)=>{
-    /*axios.get('http://146.59.195.214:8006/api/v1/teachers/all')
-        .then((response) => {
-            res.status(200).json(response.data)
-        })*/
     await professor.find({}).then((result)=>{
         res.status(200).json(result)
     },(err)=>{
@@ -914,8 +910,8 @@ router.put('/user/:userEmail/password', async function(req, res) {
  * @returns {object} 200 - user updated
  * @returns {Error}  default - Unexpected error
  */
-router.put('/user/:userEmail/:userProfile', async function(req, res) {
-        user.findOneAndUpdate({email: req.params.userEmail}, {$set:{profile:req.params.userProfile}},function(err, doc){
+router.put('/user/:userEmail/profile', async function(req, res) {
+        user.findOneAndUpdate({email: req.params.userEmail}, {$set:{profile:req.body.profil}},function(err, doc){
             if(err){
                 res.status(204).json({ Result : "204 - Password not changed"})
             }else
