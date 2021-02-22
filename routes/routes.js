@@ -110,6 +110,13 @@ const transporter = nodemailer.createTransport({
  * @property {string} group
  */
 
+/**
+ * @typedef email
+ * @property {string} to
+ * @property {string} subject
+ * @property {string} text
+ */
+
 // ----------------------------
 // -----------[POST]-----------
 // ----------------------------
@@ -118,7 +125,7 @@ const transporter = nodemailer.createTransport({
  * Send Email
  * @route POST /sendEmail
  * @group user - Operations about user
- * @returns {user.model} 201 - Email sent
+ * @returns {email.model} 201 - Email sent
  * @returns {Error}  Default - Bad request
  */
 router.post('/sendEmail', (req, res) => {
